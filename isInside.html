@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Parcel Sandbox</title>
+    <meta charset="UTF-8" />
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <canvas width="380" height="160"></canvas>
+
+    <script>
+      const canvas = document.querySelector("canvas");
+      const CTX = canvas.getContext("2d");
+
+      // fill in background
+      CTX.fillStyle = "black";
+      CTX.fillRect(0, 0, canvas.width, canvas.height);
+
+      // fill in cell shape
+      const CellBoundaryPath =
+        "M0 80.954C0 51.64 21.5 14.865 53 7.5 87.452-.555 118.061 1 153.226 1 198.529 1 260.839 5.124 312 9.5c38.609 3.302 68 40.941 68 75.494 0 39.247-32.985 78.645-78.5 74.506-44.469-4.043-89.804-7.763-129.887-7.763-33.017 0-55.544.952-87.113 4.263C37.391 160.941 0 125.911 0 80.954z";
+      let ecoliBoundaryIllustration = new Path2D(CellBoundaryPath);
+      CTX.fillStyle = "gray";
+      CTX.fill(ecoliBoundaryIllustration);
+
+      const dotSize = 10;
+      const dots = [
+        { x: 15, y: 12 },
+        { x: 212, y: 112 }
+      ];
+
+      dots.forEach((dot) => {
+        if (CTX.isPointInPath(ecoliBoundaryIllustration, dot.x, dot.y)) {
+          CTX.fillStyle = "red";
+        } else {
+          CTX.fillStyle = "blue";
+        }
+
+        CTX.fillRect(dot.x, dot.y, dotSize, dotSize);
+      });
+    </script>
+  </body>
+</html>
