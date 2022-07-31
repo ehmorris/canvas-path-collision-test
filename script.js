@@ -63,15 +63,21 @@ const drawFrame = () => {
 
   // fill in dot
   getNewLocationInBoundary().then(({ x, y }) => {
-    objectLocation = { x, y };
+    // fill in dot shape
+    const shapeCenter = { x: x + objectSize / 2, y: y + objectSize / 2 };
     const rotationAmount = (Math.PI / 180) * objectRotationAngle;
-    objectRotationAngle = objectRotationAngle + 2;
+
     CTX.fillStyle = "red";
-    CTX.translate(x, y);
+    CTX.save();
+    CTX.translate(shapeCenter.x, shapeCenter.y);
     CTX.rotate(rotationAmount);
+    CTX.translate(-objectSize / 2, -objectSize / 2);
     CTX.fill(new Path2D(objectPath));
-    CTX.rotate(-rotationAmount);
-    CTX.translate(-x, -y);
+    CTX.restore();
+
+    // update props
+    objectRotationAngle = objectRotationAngle + 2;
+    objectLocation = { x, y };
   });
 
   window.requestAnimationFrame(drawFrame);
