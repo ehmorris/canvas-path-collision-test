@@ -58,7 +58,22 @@ const drawFrame = () => {
   CTX.fillRect(0, 0, canvas.width, canvas.height);
 
   // fill in cell shape
-  CTX.fillStyle = "gray";
+  const x = 182,
+    y = 78,
+    // Radii of the inner glow
+    innerRadius = 2,
+    outerRadius = 220;
+  const gradient = CTX.createRadialGradient(
+    x,
+    y,
+    innerRadius,
+    x,
+    y,
+    outerRadius
+  );
+  gradient.addColorStop(0, "#6F559E");
+  gradient.addColorStop(1, "#7584AD");
+  CTX.fillStyle = gradient;
   CTX.fill(cellBoundaryPathObject);
 
   // fill in dot
@@ -67,7 +82,7 @@ const drawFrame = () => {
     const shapeCenter = { x: x + objectSize / 2, y: y + objectSize / 2 };
     const rotationAmount = (Math.PI / 180) * objectRotationAngle;
 
-    CTX.fillStyle = "red";
+    CTX.fillStyle = "#FFFFFF";
     CTX.save();
     CTX.translate(shapeCenter.x, shapeCenter.y);
     CTX.rotate(rotationAmount);
