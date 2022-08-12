@@ -15,7 +15,8 @@ let objectRotationAngle = 0;
 // helpers
 const nextPositionAlongHeading = (position, speed, headingInDeg) => ({
   x: position.x + speed * Math.cos(headingInDeg * (Math.PI / 180)),
-  y: position.y + speed * Math.sin(headingInDeg * (Math.PI / 180))
+  y: position.y + speed * Math.sin(headingInDeg * (Math.PI / 180)),
+  heading: headingInDeg
 });
 
 const randomBetween = (min, max) => Math.random() * (max - min) + min;
@@ -28,23 +29,39 @@ const isShapeInPath = (path, location, size) =>
   CTX.isPointInPath(path, location.x, location.y + size);
 
 // recurse until new location inside boundary is found
-const getNewLocationInBoundary = () => {
+const getNewLocationInBoundary = (
+  context,
+  heading,
+  currentSpeed,
+  currentLocation,
+  currentSize,
+  boundaryPath
+) => {
   // add jitter to movement
-  objectHeading = objectHeading + randomBetween(-20, 20);
+  const headerWithJitter = heading + randomBetween(-20, 20);
 
   // test new locations
   return new Promise((resolve) => {
     const prospectiveNewLocation = nextPositionAlongHeading(
-      objectLocation,
-      objectSpeed,
-      objectHeading
+      currentLocation,
+      currentSpeed,
+      headerWithJitter
     );
 
     if (
       !isShapeInPath(cellBoundaryPathObject, prospectiveNewLocation, objectSize)
     ) {
-      objectHeading = randomBetween(1, 360);
-      return resolve(getNewLocationInBoundary());
+      const newHeading = randomBetween(1, 360);
+      return resolve(
+        getNewLocationInBoundary(
+          context,
+          newHeading,
+          currentSpeed,
+          currentLocation,
+          currentSize,
+          boundaryPath
+        )
+      );
     } else {
       return resolve(prospectiveNewLocation);
     }
@@ -77,7 +94,14 @@ const drawFrame = () => {
   CTX.fill(cellBoundaryPathObject);
 
   // fill in dot
-  getNewLocationInBoundary().then(({ x, y }) => {
+  getNewLocationInBoundary(
+    CTX,
+    objectHeading,
+    objectSpeed,
+    objectLocation,
+    objectSize,
+    cellBoundaryPathObject
+  ).then(({ x, y, heading }) => {
     // fill in dot shape
     const shapeCenter = { x: x + objectSize / 2, y: y + objectSize / 2 };
     const rotationAmount = (Math.PI / 180) * objectRotationAngle;
@@ -93,6 +117,7 @@ const drawFrame = () => {
     // update props
     objectRotationAngle = objectRotationAngle + 2;
     objectLocation = { x, y };
+    objectHeading = heading;
   });
 
   window.requestAnimationFrame(drawFrame);
